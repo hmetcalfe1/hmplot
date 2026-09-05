@@ -10,7 +10,7 @@ finalise_plot(
   save_filepath = file.path(Sys.getenv("TMPDIR"), "tmp-nc.png"),
   width_pixels = 640,
   height_pixels = 450,
-  logo_image_path = file.path(system.file("data", package = "bbplot"), "placeholder.png")
+  logo_image_path = NULL
 )
 }
 \arguments{
@@ -24,8 +24,8 @@ finalise_plot(
 
 \item{height_pixels}{Height in pixels that you want to save your chart to - defaults to 450}
 
-\item{logo_image_path}{File path for the logo image you want to use in the right hand side of your chart,
-which needs to be a PNG file - defaults to hm blocks image that sits within the data folder of your package}
+\item{logo_image_path}{File path for a logo image to place in the right hand side of the footer,
+which needs to be a PNG file - defaults to NULL, i.e. no logo}
 }
 \value{
 (Invisibly) an updated ggplot object.

@@ -2,3 +2,4 @@
 
 export(finalise_plot)
 export(hm_style)
+importFrom(ggplot2,element_grob)

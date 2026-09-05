@@ -1,82 +1,59 @@
-#' Add hm theme to ggplot chart for presentations
-#'
-#' This function allows you to add the hm theme to your ggplot graphics.
-#' @keywords hm_style
-#' @export
-#' @examples
-#' ldefault_plot <- ggplot(economics, aes(date, unemploy)) +
-#'    geom_line() +
-#'      labs(
-#'          title = "Unemployed persons in the United States",
-#'          subtitle = "Monthly aggregation from 1967 - 2015",
-#'          caption = "Data source: {ggplot2} R package",
-#'          x = NULL,
-#'          y = NULL
-#'      ) +
-#'      # Unemployment level is number of unemployed in thousands.
-#'      # This declutters the figure by presenting the number of
-#'      # unemployed in millions
-#'      scale_y_continuous(
-#'          labels = scales::label_number(
-#'              scale = 0.001,
-#'              suffix = " M"
-#'          ),
-#'          limits = c(0, max(economics$unemploy))
-#'      ) +
-#' theme_hm_pres()
-
-theme_hm_pres <- function() {
+# ponytail: theme_hm_pres() and theme_hm_pub() differ only in text sizes and
+# one margin, so the theme is defined once here and the exported wrappers just
+# supply the numbers. Style changes then land in both by construction.
+hm_theme <- function(title, subtitle, caption, text, strip, gap) {
   ggplot2::theme(
-    #Text format:
-    #This sets the font, size, type and colour of text for the chart's title and aligns it to the plot, as well as setting a margin between the title and the subtitle
+    # Title, subtitle and caption, all aligned to the plot rather than the panel
     plot.title = hm_element_text(
-      size = 24,
+      size = title,
       face = "bold",
       color = "#222222",
-      margin = ggplot2::margin(b = 10)
+      margin = ggplot2::margin(b = gap)
     ),
     plot.title.position = "plot",
-    #This sets the font, size, type and colour of text for the chart's subtitle, as well as setting a margin between the subtitle and the plot
     plot.subtitle = hm_element_text(
-      size = 20,
+      size = subtitle,
       color = "#222222",
-      margin = ggplot2::margin(b = 10)
+      margin = ggplot2::margin(b = gap)
     ),
-    #This sets the font, size, type and colour of text for the chart's caption, and aligns it to the plot
     plot.caption = hm_element_text(
-      size = 12,
+      size = caption,
       color = "#666666",
-      margin = ggplot2::margin(t = 10),
+      margin = ggplot2::margin(t = gap),
       hjust = 0
     ),
     plot.caption.position = "plot",
-    #This leaves the caption text element empty, because it is set elsewhere in the finalise plot function
 
-    #Legend format
-    #This sets the position and alignment of the legend, removes a title and backround for it and sets the requirements for any text within the legend. The legend may often need some more manual tweaking when it comes to its exact position based on the plot coordinates.
+    # Legend: no title or background, sat above the panel. Often needs manual
+    # nudging per chart based on the plot coordinates.
     legend.position = "top",
     legend.text.align = 0,
     legend.background = ggplot2::element_blank(),
     legend.title = ggplot2::element_blank(),
     legend.key = ggplot2::element_blank(),
     legend.text = hm_element_text(
-      size = 18,
+      size = text,
       color = "#222222"
     ),
 
-    #Axis format
-    #This sets the text font, size and colour for the axis test, as well as setting the margins and removes lines and ticks. In some cases, axis lines and axis ticks are things we would want to have in the chart - the cookbook shows examples of how to do so.
+    # Axes: no titles, no lines, ticks on x only
     axis.title = ggplot2::element_blank(),
     axis.text = hm_element_text(
-      size = 18,
+      size = text,
       color = "#222222"
     ),
     axis.text.x = hm_element_text(margin = ggplot2::margin(5, b = 10)),
     axis.ticks = ggplot2::element_blank(),
     axis.line = ggplot2::element_blank(),
+    axis.ticks.x = ggplot2::element_line(
+      linetype = "solid",
+      linewidth = 0.25,
+      color = "#999999"
+    ),
+    axis.ticks.length.x = grid::unit(2.5, units = "pt"),
 
-    #Grid lines
-    #This removes all minor gridlines and adds major y gridlines. In many cases you will want to change this to remove y gridlines and add x gridlines. The cookbook shows you examples for doing so
+    # Gridlines: dashed major y only. Some charts want the opposite - add
+    # panel.grid.major.x back in your own theme() call after this one.
     panel.grid.minor = ggplot2::element_blank(),
     panel.grid.major.y = ggplot2::element_line(
       color = "#999999",
@@ -84,123 +61,74 @@ theme_hm_pres <- function() {
       linewidth = 0.15
     ),
     panel.grid.major.x = ggplot2::element_blank(),
-    axis.ticks.x = element_line(
-      linetype = "solid",
-      linewidth = 0.25,
-      color = "#999999"
-    ),
-    axis.ticks.length.x = unit(2.5, units = "pt"),
 
-    #Blank background
-    #This sets the panel background as blank, removing the standard grey ggplot background colour from the plot
+    # White throughout, dropping ggplot's grey panel and facet strips
     panel.background = ggplot2::element_blank(),
-
-    #Strip background (#This sets the panel background for facet-wrapped plots to white, removing the standard grey ggplot background colour and sets the title size of the facet-wrap title to font size 22)
     strip.background = ggplot2::element_rect(fill = "white"),
-    strip.text = hm_element_text(size = 22, hjust = 0)
+    strip.text = hm_element_text(size = strip, hjust = 0)
+  )
+}
+
+#' Add hm theme to ggplot chart for presentations
+#'
+#' Large text sized for slides. Added to the end of a ggplot chain. Colours for
+#' lines and bars are not set here - set them in your geoms as usual.
+#'
+#' @return A ggplot2 theme object.
+#' @seealso [theme_hm_pub()] for the smaller publication sizing.
+#' @keywords hm_style
+#' @export
+#' @examples
+#' library(ggplot2)
+#' ggplot(economics, aes(date, unemploy)) +
+#'   geom_line() +
+#'   labs(
+#'     title = "Unemployed persons in the United States",
+#'     subtitle = "Monthly aggregation from 1967 - 2015",
+#'     caption = "Data source: {ggplot2} R package",
+#'     x = NULL,
+#'     y = NULL
+#'   ) +
+#'   theme_hm_pres()
+theme_hm_pres <- function() {
+  hm_theme(
+    title = 24,
+    subtitle = 20,
+    caption = 12,
+    text = 18,
+    strip = 22,
+    gap = 10
   )
 }
 
 #' Add hm theme to ggplot chart for publications
 #'
-#' This function allows you to add the hm theme to your ggplot graphics.
+#' As [theme_hm_pres()] but with text sized for a journal figure.
+#'
+#' @return A ggplot2 theme object.
+#' @seealso [theme_hm_pres()] for the larger presentation sizing.
 #' @keywords hm_style
 #' @export
 #' @examples
-#' ldefault_plot <- ggplot(economics, aes(date, unemploy)) +
-#'    geom_line() +
-#'      labs(
-#'          title = "Unemployed persons in the United States",
-#'          subtitle = "Monthly aggregation from 1967 - 2015",
-#'          caption = "Data source: {ggplot2} R package",
-#'          x = NULL,
-#'          y = NULL
-#'      ) +
-#'      # Unemployment level is number of unemployed in thousands.
-#'      # This declutters the figure by presenting the number of
-#'      # unemployed in millions
-#'      scale_y_continuous(
-#'          labels = scales::label_number(
-#'              scale = 0.001,
-#'              suffix = " M"
-#'          ),
-#'          limits = c(0, max(economics$unemploy))
-#'      ) +
-#' theme_hm_pub()
-
+#' library(ggplot2)
+#' ggplot(economics, aes(date, unemploy)) +
+#'   geom_line() +
+#'   labs(
+#'     title = "Unemployed persons in the United States",
+#'     subtitle = "Monthly aggregation from 1967 - 2015",
+#'     caption = "Data source: {ggplot2} R package",
+#'     x = NULL,
+#'     y = NULL
+#'   ) +
+#'   theme_hm_pub()
 theme_hm_pub <- function() {
-  ggplot2::theme(
-    #Text format:
-    #This sets the font, size, type and colour of text for the chart's title and aligns it to the plot, as well as setting a margin between the title and the subtitle
-    plot.title = hm_element_text(
-      size = 14,
-      face = "bold",
-      color = "#222222",
-      margin = ggplot2::margin(b = 8)
-    ),
-    plot.title.position = "plot",
-    #This sets the font, size, type and colour of text for the chart's subtitle, as well as setting a margin between the subtitle and the plot
-    plot.subtitle = hm_element_text(
-      size = 12,
-      color = "#222222",
-      margin = ggplot2::margin(b = 8)
-    ),
-    #This sets the font, size, type and colour of text for the chart's caption, and aligns it to the plot
-    plot.caption = hm_element_text(
-      size = 8,
-      color = "#666666",
-      margin = ggplot2::margin(t = 8),
-      hjust = 0
-    ),
-    plot.caption.position = "plot",
-    #This leaves the caption text element empty, because it is set elsewhere in the finalise plot function
-
-    #Legend format
-    #This sets the position and alignment of the legend, removes a title and backround for it and sets the requirements for any text within the legend. The legend may often need some more manual tweaking when it comes to its exact position based on the plot coordinates.
-    legend.position = "top",
-    legend.text.align = 0,
-    legend.background = ggplot2::element_blank(),
-    legend.title = ggplot2::element_blank(),
-    legend.key = ggplot2::element_blank(),
-    legend.text = hm_element_text(
-      size = 12,
-      color = "#222222"
-    ),
-
-    #Axis format
-    #This sets the text font, size and colour for the axis test, as well as setting the margins and removes lines and ticks. In some cases, axis lines and axis ticks are things we would want to have in the chart - the cookbook shows examples of how to do so.
-    axis.title = ggplot2::element_blank(),
-    axis.text = hm_element_text(
-      size = 12,
-      color = "#222222"
-    ),
-    axis.text.x = hm_element_text(margin = ggplot2::margin(5, b = 10)),
-    axis.ticks = ggplot2::element_blank(),
-    axis.line = ggplot2::element_blank(),
-
-    #Grid lines
-    #This removes all minor gridlines and adds major y gridlines. In many cases you will want to change this to remove y gridlines and add x gridlines. The cookbook shows you examples for doing so
-    panel.grid.minor = ggplot2::element_blank(),
-    panel.grid.major.y = ggplot2::element_line(
-      color = "#999999",
-      linetype = "dashed",
-      linewidth = 0.15
-    ),
-    panel.grid.major.x = ggplot2::element_blank(),
-    axis.ticks.x = element_line(
-      linetype = "solid",
-      linewidth = 0.25,
-      color = "#999999"
-    ),
-    axis.ticks.length.x = unit(2.5, units = "pt"),
-
-    #Blank background
-    #This sets the panel background as blank, removing the standard grey ggplot background colour from the plot
-    panel.background = ggplot2::element_blank(),
-
-    #Strip background (#This sets the panel background for facet-wrapped plots to white, removing the standard grey ggplot background colour and sets the title size of the facet-wrap title to font size 12)
-    strip.background = ggplot2::element_rect(fill = "white"),
-    strip.text = hm_element_text(size = 12, hjust = 0)
+  hm_theme(
+    title = 14,
+    subtitle = 12,
+    caption = 8,
+    text = 12,
+    strip = 12,
+    gap = 8
   )
 }
 

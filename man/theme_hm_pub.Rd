@@ -6,29 +6,26 @@
 \usage{
 theme_hm_pub()
 }
+\value{
+A ggplot2 theme object.
+}
 \description{
-This function allows you to add the hm theme to your ggplot graphics.
+As [theme_hm_pres()] but with text sized for a journal figure.
 }
 \examples{
-ldefault_plot <- ggplot(economics, aes(date, unemploy)) +
-   geom_line() +
-     labs(
-         title = "Unemployed persons in the United States",
-         subtitle = "Monthly aggregation from 1967 - 2015",
-         caption = "Data source: {ggplot2} R package",
-         x = NULL,
-         y = NULL
-     ) +
-     # Unemployment level is number of unemployed in thousands.
-     # This declutters the figure by presenting the number of
-     # unemployed in millions
-     scale_y_continuous(
-         labels = scales::label_number(
-             scale = 0.001,
-             suffix = " M"
-         ),
-         limits = c(0, max(economics$unemploy))
-     ) +
-theme_hm_pub()
+library(ggplot2)
+ggplot(economics, aes(date, unemploy)) +
+  geom_line() +
+  labs(
+    title = "Unemployed persons in the United States",
+    subtitle = "Monthly aggregation from 1967 - 2015",
+    caption = "Data source: {ggplot2} R package",
+    x = NULL,
+    y = NULL
+  ) +
+  theme_hm_pub()
+}
+\seealso{
+[theme_hm_pres()] for the larger presentation sizing.
 }
 \keyword{hm_style}

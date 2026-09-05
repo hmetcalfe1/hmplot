@@ -1,0 +1,19 @@
+Package: hmplot
+Title: MAKING GGPLOT GRAPHICS IN hm NEWS STYLE
+Version: 0.2
+Authors@R: c(
+    person("Helen", "Metcalfe", , "helen.metcalfe@rothamsted.ac.uk", c("aut", "cre"))  )
+Description: Helps create and export ggplot2 charts in the style used by 
+    hm, one for styling and another for exporting ggplot graphics
+Depends: R (>= 3.3.0)
+Imports:
+    ggplot2,
+    png,
+    grid,
+    ggpubr,
+    dplyr,
+    data.table
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Config/roxygen2/version: 8.1.0
